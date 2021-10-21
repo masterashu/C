@@ -1,84 +1,59 @@
-//sorting of array list using Radix sort
 #include <stdio.h>
 
-#define range 10  // Range for integers is 10 as digits range from 0-9
-
-// Utility function to get the maximum value in ar[]
-int MAX(int ar[], int size){
-    int i, max = ar[0];
-    for(i = 0; i<size; i++){
-        if(ar[i]>max)
-            max = ar[i];
-    }
-    return max;
+int getMax(int array[], int n) {
+  int max = array[0];
+  for (int i = 1; i < n; i++)
+    if (array[i] > max)
+      max = array[i];
+  return max;
 }
 
-// Counting sort according to the digit represented by place
-void countSort(int arr[],int n,int place)
-{
-        int i,freq[range]={0};         
-        int output[n];
-    
-        // Store count of occurences in freq[]
-        for(i=0;i<n;i++)
-                freq[(arr[i]/place)%range]++;
-    
-        // Change freq[i] so that it contains the actual position of the digit in output[]
-        for(i=1;i<range;i++)
-                freq[i]+=freq[i-1];
-    
-        // Build the output array
-        for(i=n-1;i>=0;i--)
-        {
-                output[freq[(arr[i]/place)%range]-1]=arr[i];
-                freq[(arr[i]/place)%range]--;
-        }
-        
-        // Copy the output array to arr[], so it contains numbers according to the current digit
-        for(i=0;i<n;i++)
-                arr[i]=output[i];
+void countingSort(int array[], int size, int place) {
+  int output[size + 1];
+  int max = (array[0] / place) % 10;
+
+  for (int i = 1; i < size; i++) {
+    if (((array[i] / place) % 10) > max)
+      max = array[i];
+  }
+  int count[max + 1];
+
+  for (int i = 0; i < max; ++i)
+    count[i] = 0;
+
+  for (int i = 0; i < size; i++)
+    count[(array[i] / place) % 10]++;
+   
+  for (int i = 1; i < 10; i++)
+    count[i] += count[i - 1];
+
+  for (int i = size - 1; i >= 0; i--) {
+    output[count[(array[i] / place) % 10] - 1] = array[i];
+    count[(array[i] / place) % 10]--;
+  }
+
+  for (int i = 0; i < size; i++)
+    array[i] = output[i];
 }
 
-/*This is where the sorting of the array takes place
- arr[] --- Array to be sorted
- n --- Array Size
- max --- Maximum element in Array
- */
-void radixsort(int arr[],int n,int max)            //max is the maximum element in the array
-{
-        int mul=1;
-        while(max)
-        {
-                countsort(arr,n,mul);
-                mul*=10;
-                max/=10;
-        }
+void radixsort(int array[], int size) {
+
+  int max = getMax(array, size);
+
+  for (int place = 1; max / place > 0; place *= 10)
+    countingSort(array, size, place);
 }
 
-int main(int argc, const char * argv[]){
-    int n;
-    printf("Enter size of array:\n");
-    scanf("%d", &n); // E.g. 8
-    
-    printf("Enter the elements of the array\n");
-    int i;
-    int arr[n];
-    for(i = 0; i < n; i++){
-        scanf("%d", &arr[i] );
-    }
-    
-    printf("Original array: ");
-    display(arr, n);                   // Original array : 10 11 9 8 4 7 3 8
-    
-    int max;
-    max = MAX(arr,n);
-    
-    radixsort(arr, n, max);
-    
-    printf("Sorted array: ");
-    display(arr, n);                // Sorted array : 3 4 7 8 8 9 10 11
-    
-    return 0;
+void printArray(int array[], int size) {
+  for (int i = 0; i < size; ++i) {
+    printf("%d  ", array[i]);
+  }
+  printf("\n");
+}
 
-
+int main() {
+  int array[] = {12, 43, 54, 23, 1, 45, 88};
+  int n = sizeof(array) / sizeof(array[0]);
+  radixsort(array, n);
+  printArray(array, n);
 }
